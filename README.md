@@ -11,6 +11,15 @@ UI is built with ...
 * Vue.js
 * [Figma plugin ds](https://github.com/thomas-lowry/figma-plugin-ds#components)
 
+
+## Todo
+
+* Design
+* Pages can be configured via a gist to allow teams to specify standard page
+* Clean up figma.clientStorage.getAsync client story copy/pasta
+  * get / set functions need to return a promise so the caller can act on the results
+
+
 ## Build
 
 ```sh
