@@ -81,7 +81,7 @@ export default class PageCreator extends Vue {
   pages = []
   tempDefault = ''
   defaultPages = [
-    '🎟 Cover',
+    '📘 Cover',
     '🖼 Visual Design',
     '📱 Responsive',
     '🎮 Prototypes',
@@ -90,6 +90,7 @@ export default class PageCreator extends Vue {
     '☈ Flows',
     '⚽️ Playground',
     '🧬 Research',
+    '📍 Components',
     '📦 Archive',
   ]
   selectedDefaults = [] //watch selected form inputs and 

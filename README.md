@@ -2,6 +2,8 @@
 
 PageFlow allows you to quickly create pages your team uses in its workflow as you need them.
 
+[Video of Pageflow 1.0 in action](PageFlow-1.0.0.mp4)
+
 The plugin is VERY early in development. 
 
 UI is built with ...
