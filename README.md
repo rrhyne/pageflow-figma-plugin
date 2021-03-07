@@ -1,16 +1,26 @@
-# figma-plugin-vue-sample
+# pageflow-figma-plugin
 
-This is a sample [figma Plugin](https://www.figma.com/plugin-docs/intro/).
+PageFlow allows you to quickly create pages your team uses in its workflow as you need them.
+
+The plugin is VERY early in development. 
 
 UI is built with ...
 
 * Vue.js
-* TypeScript
-* Sass
-* Bulma
+* [Figma plugin ds](https://github.com/thomas-lowry/figma-plugin-ds#components)
 
 ## Build
 
 ```sh
-$ npm run build
+$ yarn build
 ```
+
+## Include in figma
+
+* Clone this repo somewhere on your local system
+* yarn 
+* yarn build
+* In figma:
+  * Hamburger menu (wtf is that called?) > Plugins > More > Development > New plugin...
+  * Click to select a manifest file
+  * Select the cloned folder and click manifest.json
