@@ -1,75 +1,67 @@
 // This shows the HTML page in "ui.html".
 figma.showUI(__html__);
 
-function setPrefs(data){
-    console.log('setPrefs', data)
+async function setPrefs(data){
+    return await figma.clientStorage.setAsync('pagFlowPrefs', data)
+}
 
-    figma.clientStorage.setAsync('pagFlowPrefs', data)
-    .then(() => {
-        getPrefs()
-    });
+async function getPrefs(){
+    return await figma.clientStorage.getAsync('pagFlowPrefs')
+}
+
+async function getPrefsAndReturnToUI(){
+    const prefs = await getPrefs()
+
+    //return prefs to the UI
+    let m = {'type':'prefs','data':prefs}
+    figma.ui.postMessage(m)
+}
+
+async function removePageFromPrefs(pageToRemove){
+    const prefs = await getPrefs()
+    const index = prefs.indexOf(pageToRemove)
     
+    if(index != -1){
+        prefs.splice(index, 1)
+        await setPrefs(prefs)
+
+        let m = {'type':'prefs','data':prefs}
+        figma.ui.postMessage(m)
+    }
 }
 
-function getPrefs(){
+async function clearPrefs(){
+    await setPrefs(null)
+    const prefs = await getPrefs()
 
-    let p
-    figma.clientStorage.getAsync('pagFlowPrefs').then(prefs => {
-        if (prefs) {
-            console.log('get prefs', prefs);
-            p = prefs;
-        } else {
-            p = null
-            //figma.ui.postMessage({ type: 'prefs', prefs: null });
-            // console.log('gotta save new prefs', message.defaultPrefs);
-            // figma.clientStorage.setAsync('aeux.prefs', message.defaultPrefs)
-            //     .then(() => {
-            //     figma.ui.postMessage({ type: 'retPrefs', prefs: message.defaultPrefs });
-            // });
-            // return message.defaultPrefs;
-        }
-    })
-    return p
+    //return prefs to the UI
+    let m = {'type':'prefs-cleared','data':prefs}
+    figma.ui.postMessage(m)
 }
 
-
+//todo: cannot call async methods here. 
 figma.ui.onmessage = ( msg => {
 
     if (msg.type == 'clear-prefs'){
-        
-        setPrefs(null)
-
-        //return prefs to the UI
-        let m = {'type':'prefs-cleared','data':"Prefs were cleared"}
-        figma.ui.postMessage(m)
-
+        clearPrefs()
     }
 
     if (msg.type == 'set-prefs'){
-        console.log('set-prefs', msg.data)
         setPrefs(msg.data)
+
         //return prefs to the UI
         let m = {'type':'prefs-set','data':msg.data}
         figma.ui.postMessage(m)
-
     }
 
     if(msg.type == 'get-prefs'){
-
-        const prefs = getPrefs()
-
-        //return prefs to the UI
-        let m = {'type':'prefs','data':prefs}
-        console.log(m);
-        figma.ui.postMessage(m)
-
+        getPrefsAndReturnToUI()
     }
 
 
     if (msg.type == 'start-plugin') {
 
         figma.clientStorage.getAsync('pagFlowPrefs').then(prefs => {
-            console.log('start plugin, get prefs', prefs);
             figma.ui.postMessage({'type':'prefs','data':prefs})
         })
 
@@ -80,20 +72,22 @@ figma.ui.onmessage = ( msg => {
         console.log('add-default', msg.data)
 
         figma.clientStorage.getAsync('pagFlowPrefs').then(prefs => {
-            console.log('add-default prefs', prefs)
             prefs.push(msg.data)
-            console.log('add-default pages after adding', prefs)
             figma.clientStorage.setAsync('pagFlowPrefs', prefs).then(() => {
-
                 //return the prefs
                 figma.clientStorage.getAsync('pagFlowPrefs').then(prefs => {
                     console.log('start plugin, get prefs', prefs);
                     figma.ui.postMessage({'type':'prefs','data':prefs})
                 })
-
             });
 
         })
+
+    }
+
+    if (msg.type == 'remove-page') {
+        
+        removePageFromPrefs(msg.data)
 
     }
 

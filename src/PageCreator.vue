@@ -1,14 +1,14 @@
 <template>
   <div class="container">
 
-    <div v-if="pages == null && !settings">
+    <div v-if=" (pages == null || pages == []) && !settings">
       <h5>Setup PageFlow</h5>
       <p class="type type--large">PageFlow allows you to quickly create pages your team uses in its workflow as you need them. 
         To get started, select the pages your team uses from this default list or add your own:</p>
       
       <ul class="page-list">
         <li v-for="(page, index) in defaultPages" :key="index">
-            <input v-bind:id="'page'+index" type="checkbox"   @change="addToSelected(page)">
+            <input v-bind:id="'page'+index" type="checkbox" @change="addToSelected(page)">
             <label v-bind:for="'page'+index" >{{page}}</label>
         </li>
       </ul>
@@ -47,7 +47,14 @@
       <div>
         <ul class="page-list button-list">
           <li v-for="(page, index) in pages" :key="index">
-            <button class='page-button' @click="createPage(page)">{{page}}</button>
+            <div style="display:flex;">
+              <div style="flex-grow: 1;">
+                  <button class='page-button' @click="createPage(page)">{{page}}</button>
+              </div>
+              <div style="flex-grow: 1;text-align:right">
+                <button  class='page-button' @click="removePage(page)">-</button>
+              </div>
+            </div>
           </li>
         </ul>
       </div>
@@ -121,6 +128,9 @@ export default class PageCreator extends Vue {
   newPage = ''
   successStoring = true
 
+  showMinus(){
+    console.log('show minus')
+  }
 
   toggleSettings(){
     this.settings = !this.settings
@@ -130,6 +140,11 @@ export default class PageCreator extends Vue {
 
   addToSelected (page){
     this.selectedDefaults.push(page)
+  }
+
+  addToPages (page, oldValue){
+    console.log('addToPage',page, oldValue)
+    //this.pages.push(page)
   }
 
   //todo consume message type from plugin code and respond accordingly
@@ -163,8 +178,12 @@ export default class PageCreator extends Vue {
   }
 
   createPage(pageText){
-    console.log('createPage', pageText)
     parent.postMessage({ pluginMessage: { type: 'create-page', data: pageText} }, '*')
+  }
+
+  removePage(pageText){
+    console.log('removePage', pageText)
+    parent.postMessage({ pluginMessage: { type: 'remove-page', data: pageText} }, '*')
   }
 
   storeDefault() {
