@@ -6,7 +6,9 @@ async function setPrefs(data){
 }
 
 async function getPrefs(){
-    return await figma.clientStorage.getAsync('pagFlowPrefs')
+    let prefs = await figma.clientStorage.getAsync('pagFlowPrefs')
+    if(prefs == null) prefs = []
+    return prefs
 }
 
 async function getPrefsAndReturnToUI(){
@@ -17,10 +19,11 @@ async function getPrefsAndReturnToUI(){
     figma.ui.postMessage(m)
 }
 
-async function removePageFromPrefs(pageToRemove){
+async function removePageFromPrefs(pageToRemove: string){
     const prefs = await getPrefs()
     const index = prefs.indexOf(pageToRemove)
-    
+
+    //remove the page from the retrieved prefs array
     if(index != -1){
         prefs.splice(index, 1)
         await setPrefs(prefs)
@@ -50,7 +53,9 @@ figma.ui.onmessage = ( msg => {
         setPrefs(msg.data)
 
         //return prefs to the UI
-        let m = {'type':'prefs-set','data':msg.data}
+        let prefs = msg.data
+        if(prefs == null) prefs = []
+        let m = {'type':'prefs-set','data':prefs}
         figma.ui.postMessage(m)
     }
 
@@ -60,11 +65,7 @@ figma.ui.onmessage = ( msg => {
 
 
     if (msg.type == 'start-plugin') {
-
-        figma.clientStorage.getAsync('pagFlowPrefs').then(prefs => {
-            figma.ui.postMessage({'type':'prefs','data':prefs})
-        })
-
+        getPrefsAndReturnToUI()
     }
 
     if (msg.type == 'add-default') {

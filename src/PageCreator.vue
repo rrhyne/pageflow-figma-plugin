@@ -1,34 +1,7 @@
 <template>
   <div class="container">
 
-    <div v-if=" (pages == null || pages == []) && !settings">
-      <h5>Setup PageFlow</h5>
-      <p class="type type--large">PageFlow allows you to quickly create pages your team uses in its workflow as you need them. 
-        To get started, select the pages your team uses from this default list or add your own:</p>
-      
-      <ul class="page-list">
-        <li v-for="(page, index) in defaultPages" :key="index">
-            <input v-bind:id="'page'+index" type="checkbox" @change="addToSelected(page)">
-            <label v-bind:for="'page'+index" >{{page}}</label>
-        </li>
-      </ul>
-      
-      <div style='margin-bottom:10px;'>
-
-        <p class="type type--large">Add page</p>
-
-        <input v-model="tempDefault" type="input" class="input__field"  style='width: 215px;float:left;margin-right:10px;' />
-        <button class='button button--secondary' @click="addTempDefault()" style='float:left'>+</button>
-        <br style="overflow: auto;">
-
-      </div>
-
-      <div style='margin-top:10px;padding-top:10px;'>
-        <button class='button button--primary' @click="setDefaults()">Set default pages</button>
-      </div>
-    </div>
-
-    <div v-if="pages != null && !settings">
+    <div v-if="!settings">
       
       <div style="display:flex;">
         <div style="flex-grow: 1;margin-top:8px;">
@@ -64,20 +37,35 @@
 
     <div v-if='settings'>
 
+      <h5>Setup PageFlow</h5>
+      <p class="type type--large">PageFlow allows you to quickly create pages your team uses in its workflow as you need them. 
+      To get started, select the pages your team uses from this default list or add your own:</p>
+
       <div style="display:flex;">
         <div style="flex-grow: 1;margin-top:8px;">
             <h5>Settings</h5>
         </div>
       </div>
 
+       <ul class="page-list">
+        <li v-for="(page, index) in defaultPages" :key="index">
+            <input v-bind:id="'page'+index" type="checkbox" @change="addToSelected(page)">
+            <label v-bind:for="'page'+index" >{{page}}</label>
+        </li>
+      </ul>
+
       <div style='padding-top:10px;padding-bottom:10px;'>
         <label class="type type--large">Add default page:</label>
         <input v-model="tempDefault" type="input" class="input__field"  style='width: 215px;float:left;margin-right:10px;' />
-        <button class='button button--secondary' @click="storeDefault()" style='float:left'>+</button>
+        <button class='button button--secondary' @click="addTempDefault()" style='float:left'>+</button>
         <br style="overflow: auto;">
         <p>
           <span v-if='successStoring' class="type type--large" style="color:green">Added: {{tempDefault}}</span>
         </p>
+      </div>
+
+      <div style='margin-top:10px;padding-top:10px;'>
+        <button class='button button--primary' @click="setDefaults()">Set default pages</button>
       </div>
 
       <div style='padding-top:10px;padding-bottom:10px;'>
@@ -128,8 +116,13 @@ export default class PageCreator extends Vue {
   newPage = ''
   successStoring = true
 
-  showMinus(){
-    console.log('show minus')
+
+  //watch pages... if it's null, show settings
+  @Watch('pages')
+  pagesChanged(value: Array<string>, oldValue: Array<string>) {
+    console.log('pages changed', value, oldValue)
+    if(value.length === 0) this.settings = true
+    if(oldValue.length === 0 && value.length > 0) this.settings = false
   }
 
   toggleSettings(){
@@ -140,11 +133,6 @@ export default class PageCreator extends Vue {
 
   addToSelected (page){
     this.selectedDefaults.push(page)
-  }
-
-  addToPages (page, oldValue){
-    console.log('addToPage',page, oldValue)
-    //this.pages.push(page)
   }
 
   //todo consume message type from plugin code and respond accordingly
@@ -182,7 +170,6 @@ export default class PageCreator extends Vue {
   }
 
   removePage(pageText){
-    console.log('removePage', pageText)
     parent.postMessage({ pluginMessage: { type: 'remove-page', data: pageText} }, '*')
   }
 
