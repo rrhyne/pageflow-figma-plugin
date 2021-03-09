@@ -50,7 +50,12 @@ figma.ui.onmessage = ( msg => {
     }
 
     if (msg.type == 'set-prefs'){
+
+        //todo: test if successful and return an error if note
         setPrefs(msg.data)
+        
+        //todo: this is pretty ugly... it simply returns the prefs that were sent to the function
+        //I do it to ensure an update of the UI is consistent with other functions that change prefs
 
         //return prefs to the UI
         let prefs = msg.data
@@ -68,39 +73,17 @@ figma.ui.onmessage = ( msg => {
         getPrefsAndReturnToUI()
     }
 
-    if (msg.type == 'add-default') {
-
-        console.log('add-default', msg.data)
-
-        figma.clientStorage.getAsync('pagFlowPrefs').then(prefs => {
-            prefs.push(msg.data)
-            figma.clientStorage.setAsync('pagFlowPrefs', prefs).then(() => {
-                //return the prefs
-                figma.clientStorage.getAsync('pagFlowPrefs').then(prefs => {
-                    console.log('start plugin, get prefs', prefs);
-                    figma.ui.postMessage({'type':'prefs','data':prefs})
-                })
-            });
-
-        })
-
-    }
-
     if (msg.type == 'remove-page') {
-        
         removePageFromPrefs(msg.data)
-
     }
 
     if (msg.type == 'create-page') {
 
-        figma.clientStorage.getAsync('pagFlowPrefs').then(prefs => {
-            prefs.push(msg.data)
-        })
-
         let page = figma.createPage()
         page.name = msg.data
-        //figma.ui.postMessage(m)
+
+        let m = {'type':'page-created','data':msg.data}
+        figma.ui.postMessage(m)
     }
 
 

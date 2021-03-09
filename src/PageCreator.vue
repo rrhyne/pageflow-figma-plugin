@@ -115,7 +115,6 @@ export default class PageCreator extends Vue {
   //watch pages... if it's null, show settings
   @Watch('pages')
   pagesChanged(value: Array<string>, oldValue: Array<string>) {
-    console.log('pages changed', value, oldValue)
     if(value.length === 0){
       this.settings = true
     } else{
@@ -126,7 +125,6 @@ export default class PageCreator extends Vue {
   toggleSettings(){
     this.settings = !this.settings
     if(this.successStoring == true) this.successStoring = false
-    console.log('toggle settings', this.settings);
   }
 
   addToSelected (page){
@@ -136,29 +134,31 @@ export default class PageCreator extends Vue {
   //todo consume message type from plugin code and respond accordingly
   consumePluginMsg (msg): void {
 
-    console.log('consumePluginMsg', msg)
     if(msg == undefined) return
     
-    if(msg.type == 'prefs-set'){
-
+    if(msg.type == 'prefs-set')
+    {
       //todo set the pages from the msg
       this.pages = msg.data
 
-    } else if (msg.type == 'prefs'){
-      //ask for page config or show only new files
-      
-      console.log('msg prefs', msg);
+    }
+    else if (msg.type == 'prefs')
+    {
       this.pages = msg.data
-
-      //todo: tell the user this is default pags
-      //todo: ask for a config file that might live in a gist
-      if(msg.data == undefined){
-        // this.pages = defaultPages;
-      }
-    } else if (msg.type == 'prefs-cleared'){
-      console.log('setting pages to null')
+    }
+    else if (msg.type == 'prefs-cleared')
+    {
       this.pages = null
       this.settings = false
+    }
+    else if(msg.type == 'page-created')
+    {
+      //todo: give notification that this item was created
+      //get index
+      //create key
+      //find by key
+      //turn on item
+      //timer turn off added
     }
 
   }
@@ -169,12 +169,6 @@ export default class PageCreator extends Vue {
 
   removePage(pageText){
     parent.postMessage({ pluginMessage: { type: 'remove-page', data: pageText} }, '*')
-  }
-
-  storeDefault() {
-    parent.postMessage({ pluginMessage: { type: 'add-default', data: this.tempDefault } }, '*')
-    //todo: this is pretty fake... show on response from add-default
-    this.successStoring = true
   }
 
   setDefaults(){
