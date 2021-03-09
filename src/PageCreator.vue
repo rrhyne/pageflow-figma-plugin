@@ -61,10 +61,6 @@
         <p v-if='successStoring' class="type type--large" style="color:green">Added page!</p>
       </div>
 
-      <!-- <div style='padding-top:10px;padding-bottom:10px;'>
-        <button  class='button button--secondary-destructive' @click="clearPrefs()">Clear prefs</button>
-      </div> -->
-
       <div class='bottom-buttons'>
           <button @click="settings=false" class='button button--secondary'>Cancel</button>
           <button class='button button--primary' @click="setDefaults()">Set default pages</button>
@@ -174,10 +170,6 @@ export default class PageCreator extends Vue {
   setDefaults(){
     parent.postMessage({ pluginMessage: { type: 'set-prefs', data: this.selectedDefaults } }, '*')
   }
-
-  // clearPrefs(){
-  //   parent.postMessage({ pluginMessage: { type: 'clear-prefs' } }, '*')
-  // }
 
   addTempDefault(){
     this.defaultPages.push(this.tempDefault)

@@ -45,10 +45,6 @@ async function clearPrefs(){
 //todo: cannot call async methods here. 
 figma.ui.onmessage = ( msg => {
 
-    if (msg.type == 'clear-prefs'){
-        clearPrefs()
-    }
-
     if (msg.type == 'set-prefs'){
 
         //todo: test if successful and return an error if note
