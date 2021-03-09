@@ -2,12 +2,11 @@
   <div class="container">
 
     <div v-if="!settings">
-      
-      <div style="display:flex;">
-        <div style="flex-grow: 1;margin-top:8px;">
+      <div class="flex">
+        <div class="flex-grow">
             <h5>Add page</h5>
         </div>
-        <div style="flex-grow: 1;text-align:right;">
+        <div class="flex-grow text-right" >
           <button @click="toggleSettings()" class='page-button'>
             <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10.6167 6.89716C8.45001 6.89716 6.72778 8.61938 6.72778 10.786C6.72778 12.9527 8.45001 14.6749 10.6167 14.6749C12.7833 14.6749 14.5056 12.9527 14.5056 10.786C14.5056 8.61938 12.7833 6.89716 10.6167 6.89716ZM10.6167 13.5638C9.06112 13.5638 7.83889 12.3416 7.83889 10.786C7.83889 9.23049 9.06112 8.00827 10.6167 8.00827C12.1722 8.00827 13.3944 9.23049 13.3944 10.786C13.3944 12.3416 12.1722 13.5638 10.6167 13.5638Z" fill="black"/>
@@ -20,11 +19,11 @@
       <div>
         <ul class="page-list button-list">
           <li v-for="(page, index) in pages" :key="index">
-            <div style="display:flex;">
-              <div style="flex-grow: 1;">
+            <div class="flex">
+              <div class="flex-grow">
                   <button class='page-button' @click="createPage(page)">{{page}}</button>
               </div>
-              <div style="flex-grow: 1;text-align:right">
+              <div class="flex-grow text-right">
                 <button  class='page-button' @click="removePage(page)">-</button>
               </div>
             </div>
@@ -41,9 +40,9 @@
       <p class="type type--large">PageFlow allows you to quickly create pages your team uses in its workflow as you need them. 
       To get started, select the pages your team uses from this default list or add your own:</p>
 
-      <div style="display:flex;">
-        <div style="flex-grow: 1;margin-top:8px;">
-            <h5>Settings</h5>
+      <div class="flex">
+        <div class="flex-grow">
+            <h5>Default pages</h5>
         </div>
       </div>
 
@@ -54,26 +53,22 @@
         </li>
       </ul>
 
-      <div style='padding-top:10px;padding-bottom:10px;'>
-        <label class="type type--large">Add default page:</label>
-        <input v-model="tempDefault" type="input" class="input__field"  style='width: 215px;float:left;margin-right:10px;' />
+      <div>
+        <label class="type type--large">Add page:</label>
+        <input v-model="tempDefault" placeholder="Enter pagename" type="input" class="input__field"  style='width: 215px;float:left;margin-right:10px;' />
         <button class='button button--secondary' @click="addTempDefault()" style='float:left'>+</button>
-        <br style="overflow: auto;">
-        <p>
-          <span v-if='successStoring' class="type type--large" style="color:green">Added: {{tempDefault}}</span>
-        </p>
+        <br class="clearfix">  
+        <p v-if='successStoring' class="type type--large" style="color:green">Added page!</p>
       </div>
 
-      <div style='margin-top:10px;padding-top:10px;'>
-        <button class='button button--primary' @click="setDefaults()">Set default pages</button>
-      </div>
-
-      <div style='padding-top:10px;padding-bottom:10px;'>
+      <!-- <div style='padding-top:10px;padding-bottom:10px;'>
         <button  class='button button--secondary-destructive' @click="clearPrefs()">Clear prefs</button>
-      </div>
+      </div> -->
 
-      <div style='padding-bottom:10px;'>
-        <button @click="settings=false" class='button button--secondary'>Close settings</button>
+      <div class='bottom-buttons'>
+          <button @click="settings=false" class='button button--secondary'>Cancel</button>
+          <button class='button button--primary' @click="setDefaults()">Set default pages</button>
+        </div>
       </div>
 
     </div>
@@ -114,15 +109,18 @@ export default class PageCreator extends Vue {
   ]
   selectedDefaults = [] //watch selected form inputs and 
   newPage = ''
-  successStoring = true
+  successStoring = false
 
 
   //watch pages... if it's null, show settings
   @Watch('pages')
   pagesChanged(value: Array<string>, oldValue: Array<string>) {
     console.log('pages changed', value, oldValue)
-    if(value.length === 0) this.settings = true
-    if(oldValue.length === 0 && value.length > 0) this.settings = false
+    if(value.length === 0){
+      this.settings = true
+    } else{
+      this.settings = false
+    }
   }
 
   toggleSettings(){
@@ -183,13 +181,14 @@ export default class PageCreator extends Vue {
     parent.postMessage({ pluginMessage: { type: 'set-prefs', data: this.selectedDefaults } }, '*')
   }
 
-  clearPrefs(){
-    parent.postMessage({ pluginMessage: { type: 'clear-prefs' } }, '*')
-  }
+  // clearPrefs(){
+  //   parent.postMessage({ pluginMessage: { type: 'clear-prefs' } }, '*')
+  // }
 
   addTempDefault(){
     this.defaultPages.push(this.tempDefault)
     this.tempDefault = ""
+    this.successStoring = true
   }
 
 }
@@ -201,6 +200,10 @@ h5{
   margin:0em;
   padding:0em;
   line-height:1em;
+}
+
+.text-right{
+   text-align:right;
 }
 
 .container {
@@ -258,4 +261,26 @@ button {
 .page-button:hover{
   background-color:#f2f2f2;
 }
+
+.bottom-buttons{
+  margin-top:10px;
+  padding-top:10px;
+  text-align:right;
+}
+.bottom-buttons button{
+  display:inline;
+}
+
+.flex{
+  display:flex;
+}
+
+.flex-grow{
+  flex-grow: 1;
+}
+
+.clearfix{
+  clear: both;
+}
+
 </style>
